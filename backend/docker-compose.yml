@@ -1,0 +1,10 @@
+services:
+  db: 
+    image: postgres:15
+    restart: always
+    environement:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: fastapi
+      POSTGRES_DB: db
+    ports: 
+      -"5432:5432"
