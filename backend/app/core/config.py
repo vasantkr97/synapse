@@ -1,12 +1,14 @@
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    APP_NAME: str = "lovable Backend API"
-    VERSION: str = "v1.0.0"
+    PROJECT_NAME: str
+    VERSION: str
     DATABASE_URL: str
     SECRET_KEY: str
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
+    REFRESH_TOKEN_EXPIRE_DAYS: int
+    BACKEND_CORS_ORIGINS: str
 
     class Config:
         env_file = ".env"

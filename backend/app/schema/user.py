@@ -25,8 +25,18 @@ class UserResonse(UserBase):
 
 class Token(BaseModel):
     access_token: str
-    toekn_type: str
+    refresh_token: str
+    token_type: str
 
 class TokenData(BaseModel):
-    username: Optional[str] = None
+    """Schema for decoded toeken data"""
+    user_id: Optional[int] = None
+    username: Optional[int] = None
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str = Field(..., description="refresh token")
     
+class PasswordChange(BaseModel):
+    old_password: str = Field(..., description="Current password")
+    new_password: str = Field(..., min_length=8, description="New password")

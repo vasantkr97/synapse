@@ -40,6 +40,17 @@ def create_refresh_token(data: dict) -> str:
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
+def verify_token(token: str, token_type: str = "access") -> dict:
+    "verify and decode a JWT token"
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        print("payload in security.py",payload)
+        if payload.get("type") != token_type:
+            raise ValueError("Invalid token type")
+        return payload
+    except JWTError:
+        raise ValueError("Could not validate Credentials")
+
 def decode_token(token: str) -> Optional[dict]:
     """Decode and verify JWT Token"""
     try:
