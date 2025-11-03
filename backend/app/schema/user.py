@@ -1,22 +1,20 @@
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
-from Datetime import datetime
+from datetime import datetime
 from typing import Optional
 
 class UserBase(BaseModel):
+    """Base user Schema with common fields"""
     username: str = Field(..., min_length=3, max_length=50)
     email: EmailStr
 
-
 class UserCreate(UserBase):
-    password: str = Field(..., min_length=8)
-
+    password: str = Field(..., min_length=8, max_length=50)
 
 class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
-    username: Optional[str] = None
-    password: Optional[str] = None
+    username: Optional[str] = Field(None, min_length=3, max_length=50)
 
-class UserResonse(UserBase):
+class UserResponse(UserBase):
     id: int
     created_at: datetime
     updated_at: datetime
@@ -25,18 +23,20 @@ class UserResonse(UserBase):
 
 class Token(BaseModel):
     access_token: str
-    refresh_token: str
-    token_type: str
+    token_type: str = "bearer"
 
 class TokenData(BaseModel):
-    """Schema for decoded toeken data"""
     user_id: Optional[int] = None
-    username: Optional[int] = None
-
+    username: Optional[str] = None
 
 class RefreshTokenRequest(BaseModel):
-    refresh_token: str = Field(..., description="refresh token")
-    
+    refresh_token: str = Field(..., description="Refresh token")
+
 class PasswordChange(BaseModel):
-    old_password: str = Field(..., description="Current password")
-    new_password: str = Field(..., min_length=8, description="New password")
+    old_password: str
+    new_password: str
+
+class MessageResponse(BaseModel):
+    message: str
+
+    

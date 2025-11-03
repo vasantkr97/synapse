@@ -8,5 +8,3 @@ from app.services.user_service import UserServices
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
-@router.get( "/{user_id}", response_model=[UserResonse])
-async def get_user( user_id: int, db: Session = Depends(get_db), current_user)
