@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from typing import Optional
 from app.core.db import get_db
-from app.core.security import verify_token
+from app.core.security import decode_token
 from app.models.user import User
 
 oauth2_schema = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/signin", auto_error=False)
@@ -14,15 +14,21 @@ def get_current_user(
     db: Session = Depends(get_db),
     token: Optional[str] = Depends(oauth2_schema),
 ) -> User:
-    # Fallback to HttpOnly cookie if Authorization header is missing
+    """get current authenticated user from cookie token"""
+
+    token = request.cookies.get("token")
+
     if not token:
-        token = request.cookies.get("access_token")
-    if not token:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="user is not authenticated.",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
     try:
-        payload = verify_token(token, token_type="access")
-        user_id = int(payload.get("sub"))
+        payload = decode_token(token)
+        print("printing payload in dependency", payload)
+        user_id = int(payload.get("id"))
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -35,3 +41,9 @@ def get_current_user(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return user
 
+
+def require_user(request: Request) -> User:
+    user = getattr(request.state, "user", None)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+    return user

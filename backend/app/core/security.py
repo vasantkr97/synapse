@@ -21,7 +21,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     
-    to_encode.update({ 'exp': expire, "type": "access" })
+    to_encode.update({ 'exp': expire})
 
     encoded_jwt = jwt.encode(
         to_encode,
@@ -31,12 +31,10 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
 
     return encoded_jwt
 
-def verify_token(token: str, token_type: str = "access") -> dict:
+def decode_token(token: str) -> dict:
     "verify and decode a JWT token"
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        if payload.get("type") != token_type:
-            raise ValueError("Invalid token type")
         return payload
     except JWTError:
         raise ValueError("Could not validate Credentials")
