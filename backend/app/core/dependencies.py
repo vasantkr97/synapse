@@ -6,7 +6,7 @@ from app.core.db import get_db
 from app.core.security import decode_token
 from app.models.user import User
 
-oauth2_schema = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/signin", auto_error=False)
+oauth2_schema = OAuth2PasswordBearer(tokenUrl="/api/v1/endpoints/auth", auto_error=False)
 
 
 def get_current_user(
@@ -16,7 +16,6 @@ def get_current_user(
 ) -> User:
     """get current authenticated user from cookie token"""
 
-    token = request.cookies.get("token")
 
     if not token:
         raise HTTPException(

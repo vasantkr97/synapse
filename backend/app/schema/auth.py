@@ -1,5 +1,4 @@
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
-from app.schema.user import UserResponse
 from typing import Optional
 from datetime import datetime
 
@@ -11,10 +10,10 @@ class UserBase(BaseModel):
 
 class SigninSchema(BaseModel):
     email: EmailStr
-    password: str = Field(..., min_length=6)
+    password: str = Field(..., min_length=3)
 
 class SignupSchema(UserBase):
-    password: str = Field(..., min_length=8, max_length=50)
+    password: str = Field(..., min_length=4, max_length=50)
 
 class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None

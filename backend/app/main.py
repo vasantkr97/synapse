@@ -2,7 +2,7 @@ from typing import Dict, Any
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Request
-from app.core.security import verify_token
+from app.core.security import decode_token
 from app.core.db import SessionLocal
 from app.models.user import User
 from app.core.config import settings
@@ -31,7 +31,7 @@ async def auth_middleware(request: Request, call_next):
         token = request.cookies.get("access_token")
     if token:
         try:
-            payload = verify_token(token, token_type="access")
+            payload = decode_token(token, token_type="access")
             user_id = int(payload.get("sub"))
             db = SessionLocal()
             try:

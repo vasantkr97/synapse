@@ -1,11 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
-from jose import jwt
 from datetime import timedelta
 from app.core.db import get_db
 from app.core.config import settings
-from app.services.auth_service import AuthService
-from app.core.dependencies import require_user
 from app.core.security import get_password_hash
 from app.models.user import User
 from app.schema.auth import AuthResponse, SignupSchema, SigninSchema, UserResponse, MeResponse
@@ -19,7 +16,7 @@ router = APIRouter()
 async def signup(payload: SignupSchema, response: Response, db: Session = Depends(get_db)):
     """Signing up new user"""
     
-    existing_user = await db.quey(User).filter(User.email == payload.email).first()
+    existing_user = db.query(User).filter(User.email == payload.email).first()
 
     if existing_user:
         raise HTTPException(
@@ -63,7 +60,7 @@ async def signup(payload: SignupSchema, response: Response, db: Session = Depend
 async def signin(credentials: SigninSchema, response: Response, db:Session = Depends(get_db)):
     """login user and return token"""
     
-    user = await db.query(User).filter(User.email == credentials.email).first()
+    user = db.query(User).filter(User.email == credentials.email).first()
 
     if not user:
         raise HTTPException(
@@ -101,7 +98,7 @@ async def signin(credentials: SigninSchema, response: Response, db:Session = Dep
 def signout(response: Response):
     "logout user by clearing the token cookie"
 
-    response.delete_cookie(key="token", httponly=True, samesite=True)
+    response.delete_cookie(key="token", httponly=True, samesite="strict")
 
     return { "message": "logout successfully" }
 
@@ -124,27 +121,5 @@ async def get_me( current_user: User = Depends(get_current_user), db:Session = D
 
 
 
-@router.get("/me", response_model=UserResponse)
-def read_me(current_user: User = Depends(require_user)):
-    return current_user
 
 
-
-    # Check for existing email or username
-    existing_email = db.query(User).filter(User.email == payload.email).first()
-    if existing_email:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
-
-    existing_username = db.query(User).filter(User.username == payload.username).first()
-    if existing_username:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username already taken")
-
-    new_user = User(
-        username=payload.username,
-        email=payload.email,
-        password=get_password_hash(payload.password),
-    )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return {"message": "User created successfully", "user": new_user}
