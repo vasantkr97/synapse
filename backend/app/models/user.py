@@ -1,33 +1,72 @@
-from sqlalchemy import String, Integer, DateTime
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.sql import func
-from datetime import datetime
-
 from app.core.db import Base
+from sqlalchemy.orm import Mapped, mapped_column, relationship, ForeignKey
+from sqlalchemy import String, DateTime, Text, Dict
+from cuid import cuid
+from datetime import datetime
+from sqlalchemy.sql import func
+from typing import List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.project import Project
 
 
 class User(Base):
     __tablename__ = "users"
 
-    #Primary Key
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, index=True )
+    id: Mapped[str] = mapped_column(
+        String(32),
+        primary_key=True,
+        default=cuid,
+        doc="unique cuid-based user identifier"
+    )
 
-    username: Mapped[str] = mapped_column( String(50), nullable=False )
+    username: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False,
+        doc="Public display name for the user"
+    )
 
-    email: Mapped[str] = mapped_column( String(100), unique=True, nullable=False, index=True )
+    email: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False,
+        unique=True,
+        index=True,
+        doc="User's unique email address"
+    )
 
-    password: Mapped[str] = mapped_column( String(255), nullable=False )
+    password: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False,
+        doc="Bcrypt hashed password"
+    )
 
-    created_at: Mapped[datetime] = mapped_column( DateTime(timezone=True), server_default=func.now(), nullable=False )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+        doc="Timestamp for the user was created"
+    )
 
-    updated_at: Mapped[datetime] = mapped_column( DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+        doc="Timestamp for the last user update"
+    )
 
-    def __repr__(self):
-        return f"<User (id={self.id}, username={self.username}, email={self.email})>"
+    projects: Mapped[List["Project"]] = relationship(
+        "Project",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        doc="List of projects created by this user"
+    )
 
-
-
-class Projects(Base):
-    __tablenames__ = "projects"
-
+    def __repr__(self) -> str:
+        return (
+            f"<User id={self.id!r}, username={self.username!r}, email={self.email!r}>"
+        )
     
+
