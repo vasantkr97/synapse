@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     REFRESH_TOKEN_EXPIRE_DAYS: int
     BACKEND_CORS_ORIGINS: str
+    E2B_API_KEY: str
+    OPENAI_API_KEY: str
 
     class Config:
         env_file = ".env"

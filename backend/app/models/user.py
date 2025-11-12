@@ -1,6 +1,6 @@
 from app.core.db import Base
-from sqlalchemy.orm import Mapped, mapped_column, relationship, ForeignKey
-from sqlalchemy import String, DateTime, Text, Dict
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import String, DateTime, ForeignKey
 from cuid import cuid
 from datetime import datetime
 from sqlalchemy.sql import func

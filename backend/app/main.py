@@ -6,7 +6,7 @@ from app.core.security import decode_token
 from app.core.db import SessionLocal
 from app.models.user import User
 from app.core.config import settings
-from app.api.v1.router import api_router
+from app.api.router import api_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -19,7 +19,7 @@ app.add_middleware(
     allow_origins=settings.BACKEND_CORS_ORIGINS.split(",") if settings.BACKEND_CORS_ORIGINS else ["*"]
 )
 
-app.include_router(api_router, prefix="/api/v1")
+app.include_router(api_router)
 
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
