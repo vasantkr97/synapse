@@ -1,13 +1,13 @@
-from langchain_openai import ChatOpenAI
-import os
+from langchain_goolge_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("GEMINI_API_KEY")
 
 if not api_key:
     raise ValueError("OPENAI_API_KEY not found in environment variables")
 
-openAI_llm = ChatOpenAI(model="gpt-4o", temperature=0)
+gemini_llm = ChatGoogleGenerativeAI(model="gpt-4o", temperature=0)
 

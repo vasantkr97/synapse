@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from langchain_core.prompts import ChatPromptTemplate
 from app.libs.prompts.system_prompt import system_prompt
-from app.agent.llm import openAI_llm
+from app.agent.llm import gemini_llm
 
 router = APIRouter()
 
@@ -20,7 +20,7 @@ async def generate_code(req: GenerateRequest):
             ("user", "{prompt}")
         ])
 
-        chain = prompt_template | openAI_llm
+        chain = prompt_template | gemini_llm
 
         result = await chain.invoke({'prompt': req.prompt})
 
