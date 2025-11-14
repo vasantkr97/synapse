@@ -1,20 +1,35 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import List, Optional
 from langchain_core.prompts import ChatPromptTemplate
 from app.libs.prompts.system_prompt import system_prompt
 from app.agent.llm import gemini_llm
+from app.core.dependencies import get_authenticated_user
+from app.models import User, ConversationHistory
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.core.db import get_db
+import 
 
 router = APIRouter()
 
 class GenerateRequest(BaseModel):
     prompt: str
-    history: Optional[List[str]] = None
-
+    
 @router.post("/api/generate")
-async def generate_code(req: GenerateRequest):
+async def generateProject( 
+    prompt: GenerateRequest,
+    currentUser: User = Depends(get_authenticated_user),
+    db: AsyncSession = Depends(get_db)
+):
+    
     try: 
+        if not prompt:
+            return JSONResponse({"error": "prompt not givn"}, status_code=400)
+        
+        new_chat = ConversationHistory(
+            id=chat_id,
+            user_id=currentUser.id
+        )
         prompt_template = ChatPromptTemplate.from_messages([
             ("system", system_prompt.replace("{", "{{").replace("}", "}}")),
             ("user", "{prompt}")
@@ -22,7 +37,7 @@ async def generate_code(req: GenerateRequest):
 
         chain = prompt_template | gemini_llm
 
-        result = await chain.invoke({'prompt': req.prompt})
+        result = await chain.ainvoke({'prompt': prompt})
 
         return JSONResponse(
             content={

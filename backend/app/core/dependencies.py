@@ -9,7 +9,7 @@ from app.models.user import User
 oauth2_schema = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/auth", auto_error=False)
 
 
-def get_current_user(
+def get_authenticated_user(
     request: Request,
     db: Session = Depends(get_db),
     token: Optional[str] = Depends(oauth2_schema),
